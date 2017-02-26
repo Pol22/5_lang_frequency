@@ -29,7 +29,6 @@ def get_most_frequent_words(text, number_of_top):
     return ret_dict
 
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Word frequency in text')
     parser.add_argument('filepath', metavar='filepath', type=str, nargs=1,
