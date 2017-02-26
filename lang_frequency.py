@@ -1,11 +1,11 @@
 import argparse
-import os
-import re
-from collections import *
+from os import path
+from re import findall
+from collections import OrderedDict
 
 
 def load_data(filepath):
-    if not os.path.exists(filepath):
+    if not path.exists(filepath):
         print("Incorrect path")
         exit(-1)
     with open(filepath, 'r', encoding='utf8') as file_handler:
@@ -14,7 +14,7 @@ def load_data(filepath):
 
 def get_most_frequent_words(text, number_of_top):
     dict_counter = {}
-    all_words = re.findall('([^\W\d](\w|[-\']{1,2}(?=\w))+)', text)
+    all_words = findall('([^\W\d](\w|[-\']{1,2}(?=\w))+)', text)
     for word_ in all_words:
         word = word_[0]
         dict_counter.setdefault(word, 0)
