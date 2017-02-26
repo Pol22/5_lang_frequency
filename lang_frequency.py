@@ -1,42 +1,46 @@
-import sys
+import argparse
 import os
+import re
+from collections import *
 
 
 def load_data(filepath):
-    with open(filepath, 'r', encoding='utf') as file_handler:
+    if not os.path.exists(filepath):
+        print("Incorrect path")
+        exit(-1)
+    with open(filepath, 'r', encoding='utf8') as file_handler:
         return file_handler.read()
 
 
-def get_most_frequent_words(text):
-    dict_counter = dict()
-    word = ''
-    for char in text:
-        low_char = char.lower()
-        if low_char.isalpha():
-            word = word + low_char
-        else:
-            if word:
-                dict_counter.setdefault(word, 0)
-                dict_counter[word] += 1
-            word = ''
+def get_most_frequent_words(text, number_of_top):
+    dict_counter = {}
+    all_words = re.findall('([^\W\d](\w|[-\']{1,2}(?=\w))+)', text)
+    for word_ in all_words:
+        word = word_[0]
+        dict_counter.setdefault(word, 0)
+        dict_counter[word] += 1
+    ordered_dict = OrderedDict(sorted(dict_counter.items(),
+                               key=lambda x: x[1], reverse=True))
+    ret_dict = OrderedDict()
+    for word, number_of_reps in ordered_dict.items():
+        ret_dict[word] = number_of_reps
+        if len(ret_dict) == number_of_top:
+            break
+    return ret_dict
 
-    sort_words = sorted(dict_counter, key=dict_counter.get, reverse=True)
-    return_dict = dict()
-    for i in range(10):
-        return_dict[sort_words[i]] = dict_counter[sort_words[i]]
-    return return_dict
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("Input path to the text file second argument")
-        exit()
-    filepath = sys.argv[1]
-    if not os.path.exists(filepath):
-        print("Incorrect path")
-        exit()
+    parser = argparse.ArgumentParser(description='Word frequency in text')
+    parser.add_argument('filepath', metavar='filepath', type=str, nargs=1,
+                        help='path to text file')
+    args = parser.parse_args()
+    filepath = args.filepath[0]
+
     text = load_data(filepath)
-    ret_words = get_most_frequent_words(text)
-    sort_words = sorted(ret_words, key=ret_words.get, reverse=True)
-    for word in sort_words:
-        print(word, ret_words[word])
+    number_of_top = 10
+    ret_top_of_words = get_most_frequent_words(text, number_of_top)
+    print('word', '( number of reps )')
+    print('--------------------')
+    for word, number_of_reps in ret_top_of_words.items():
+        print(word, '(', number_of_reps, ')')
